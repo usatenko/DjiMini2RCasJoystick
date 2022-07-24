@@ -1,2 +1,2 @@
-pyserial==3.4
-pyvjoy==1.0.1
+pyserial==3.5
+python-uinput==0.11.2
