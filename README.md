@@ -10,3 +10,11 @@ to run it
 - connect your RC via the bottom type-c USB connector to your laptop
 - run "sudo python3 main.py -p /dev/ttyACM0"
 - your RC will be set to simulator mode and it will pass stick values to the virtual joystick (/dev/js0)
+
+If you have problems running on Python 3.11, use this solution offered by [jim3692](https://github.com/jim3692) to run on 3.10.4
+
+- Download Python 3.10.4 by running ```pyenv install 3.10.4```
+- Set it as default for this project with ```pyenv local 3.10.4```
+- Create a Python Virtual Environment with ```python -m venv .```
+- Install the dependencies in the venv with ```pip install -r requirements.txt```
+- Then run ```sudo python main.py -p /dev/ttyACM0```
