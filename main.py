@@ -10,7 +10,10 @@ args = parser.parse_args()
 maxValue = 32768
 
 events = (
-    uinput.BTN_JOYSTICK,
+    uinput.BTN_PINKIE,
+    uinput.BTN_TRIGGER,
+    uinput.BTN_THUMB,
+    uinput.BTN_THUMB2,
     uinput.ABS_X + (0, 32767, 0, 0),
     uinput.ABS_Y + (0, 32767, 0, 0),
     uinput.ABS_THROTTLE + (0, 32767, 0, 0),
@@ -118,7 +121,7 @@ def send_duml(s, source, target, cmd_type, cmd_set, cmd_id, payload = None):
     crc = calc_checksum(packet, len(packet))
     packet += struct.pack('<H',crc)
     s.write(packet)
-    #print(' '.join(format(x, '02x') for x in packet))
+    # print(' '.join(format(x, '02x') for x in packet))
 
     sequence_number += 1
 
@@ -139,7 +142,7 @@ def parseInput(input, name):
 
     return output
 
-st = {"rh": 0, "rv": 0, "lh": 0, "lv": 0}
+st = {"rh": 0, "rv": 0, "lh": 0, "lv": 0, "b1": 0, "b2": 0, "b3": 0, "b4": 0}
 
 def threaded_function():
     while(True):
@@ -149,6 +152,10 @@ def threaded_function():
         device.emit(uinput.ABS_Y, int(st["lv"]), syn=False)
         device.emit(uinput.ABS_THROTTLE, int(st["rh"]), syn=False)
         device.emit(uinput.ABS_RUDDER, int(st["rv"]))
+        device.emit(uinput.BTN_PINKIE, int(st['b1']))
+        device.emit(uinput.BTN_TRIGGER, int(st['b2']))
+        device.emit(uinput.BTN_THUMB, int(st['b3']))
+        device.emit(uinput.BTN_THUMB2, int(st['b4']))
 
 thread = Thread(target = threaded_function, args = ())
 thread.start()
@@ -160,9 +167,10 @@ try:
 
     while True:
 
-        #time.sleep(0.1)
+        # time.sleep(0.05)
         # read channel values
         send_duml(s, 0x0a, 0x06, 0x40, 0x06, 0x01, bytearray.fromhex(''))
+        send_duml(s, 0x0a, 0x06, 0x40, 0x06, 0x27, bytearray.fromhex(''))
         #s.write(bytearray.fromhex('55 0d 04 33 0a 06 eb 34 40 06 01 74 24'))
         # Don't write to a new line every time.
 #        print('\rPinged. ', end='')
@@ -187,9 +195,11 @@ try:
             else:
                 break
         data = buffer
-#        print(' '.join(format(x, '02x') for x in data))
+        if len(data) > 21:
+            pass
+            #print(str(len(data)) + "\t" + ' '.join(format(x, '02x') for x in data))
 
-        # Reverse-engineered. Controller input seems to always be len 38.
+        # Reverse-engineered. Controller input seems to always be len 38 and 58 for two duml commands respectively
         if len(data) == 38:
             # Reverse-engineered
             st["rh"] = parseInput(data[13:15], 'lv')
@@ -200,7 +210,18 @@ try:
 
             camera = parseInput(data[25:27], 'cam')
 
-#            print(st)
+        if len(data) == 58:
+            bytes = data[28:30]
+            ival = int.from_bytes(bytes, byteorder="big")
+            bits = bin(ival).lstrip('0b')
+            # print(ival & 0x2060 == 0x2060)
+            # print(bits)
+            st['b1'] = 1 if ival & 0x2060 == 0x2060 else 0
+            st['b2'] = 1 if ival & 0x2080 == 0x2080 else 0
+            st['b3'] = 1 if ival & 0x2002 == 0x2002 else 0
+            st['b4'] = 1 if ival & 0x2004 == 0x2004 else 0
+
+            #print(st)
             #with uinput.Device(events) as device:
 #            time.sleep(0.1)
         #else:
