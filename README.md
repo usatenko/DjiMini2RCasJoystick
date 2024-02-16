@@ -14,7 +14,7 @@ to run it
 - your RC will be set to simulator mode and it will pass stick values to the virtual joystick (/dev/js0)
 
 Tested joystick (buttons that work are marked with arrows):
-![image](https://github.com/usatenko/DjiMini2RCasJoystick/assets/1710344/5df616ce-a721-49d6-a023-395676f98fc3)
+<img width="486" alt="image" src="https://github.com/usatenko/DjiMini2RCasJoystick/assets/1710344/b14e6429-550e-4727-9024-fc9d70a771a1">
 
 If you have problems running it on Python 3.11, use this solution offered by [jim3692](https://github.com/jim3692) to run on 3.10.4
 
