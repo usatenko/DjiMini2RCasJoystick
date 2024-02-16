@@ -14,6 +14,7 @@ events = (
     uinput.BTN_TRIGGER,
     uinput.BTN_THUMB,
     uinput.BTN_THUMB2,
+    uinput.ABS_WHEEL + (-32767, 32767, 0, 0),
     uinput.ABS_X + (0, 32767, 0, 0),
     uinput.ABS_Y + (0, 32767, 0, 0),
     uinput.ABS_THROTTLE + (0, 32767, 0, 0),
@@ -156,7 +157,7 @@ def threaded_function():
         device.emit(uinput.BTN_TRIGGER, int(st['b2']))
         device.emit(uinput.BTN_THUMB, int(st['b3']))
         device.emit(uinput.BTN_THUMB2, int(st['b4']))
-        device.emit(uinput.ABS_RUDDER, int(st['t1']))
+        device.emit(uinput.ABS_WHEEL, int(st['t1']))
 
 thread = Thread(target = threaded_function, args = ())
 thread.start()
@@ -211,12 +212,12 @@ try:
             bytes = data[28:30]
             ival = int.from_bytes(bytes, byteorder="big")
             bits = bin(ival).lstrip('0b')
-            # print(ival & 0x2060 == 0x2060)
-            # print(bits)
-            st['b1'] = 1 if ival & 0x2060 == 0x2060 else 0
-            st['b2'] = 1 if ival & 0x2080 == 0x2080 else 0
-            st['b3'] = 1 if ival & 0x2002 == 0x2002 else 0
-            st['b4'] = 1 if ival & 0x2004 == 0x2004 else 0
+            #print(ival & 0x2060 == 0x2060)
+            #print(bits)
+            st['b1'] = 1 if ival & 0x1060 == 0x1060 else 0
+            st['b2'] = 1 if ival & 0x1080 == 0x1080 else 0
+            st['b3'] = 1 if ival & 0x1004 == 0x1004 else 0
+            st['b4'] = 1 if ival & 0x1002 == 0x1002 else 0
 
             bytes2 = data[27:29]
             ival2 = int.from_bytes(bytes2, byteorder="big")
