@@ -18,3 +18,5 @@ If you have problems running it on Python 3.11, use this solution offered by [ji
 - Create a Python Virtual Environment with ```python -m venv .```
 - Install the dependencies in the venv with ```pip install -r requirements.txt```
 - Then run ```sudo python main.py -p /dev/ttyACM0```
+
+You may need to run "sudo modprobe uinput" in case you have "OSError: [Errno 19] Failed to open the uinput device: No such device" error.
